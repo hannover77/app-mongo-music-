@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Inventario - Música Vintage{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2>📦 Inventario</h2>
+    <small class="text-muted">📚 Artistas obtenidos por consulta por referencia ($lookup)</small>
+  </div>
+  <a href="{{ url_for('inventario_new') }}" class="btn btn-success">+ Nuevo Producto</a>
+</div>
+
+{% if inventario %}
+<div class="alert alert-info mb-3">
+  <strong>ℹ️ Nota:</strong> Los nombres de artistas se obtienen dinámicamente usando <code>$lookup</code> desde la colección de artistas.
+  Solo se guardan los IDs de referencia en la base de datos.
+</div>
+
+<div class="table-responsive">
+  <table class="table table-hover table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>🎤 Artista (JOIN)</th>
+        <th>📀 Álbum</th>
+        <th>📅 Año</th>
+        <th>🎵 Género</th>
+        <th>📦 Stock</th>
+        <th>💵 Precio</th>
+        <th>💰 Total Stock</th>
+        <th>⚙️ Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in inventario %}
+      <tr>
+        <td><strong>{{ loop.index }}</strong></td>
+        <td><span class="badge bg-info">{{ i.nombre_artista }}</span></td>
+        <td>{{ i.album }}</td>
+        <td>{{ i.año }}</td>
+        <td><span class="badge bg-secondary">{{ i.genero }}</span></td>
+        <td><span class="badge {% if i.stock > 10 %}bg-success{% elif i.stock > 0 %}bg-warning{% else %}bg-danger{% endif %}">{{ i.stock }}</span></td>
+        <td>${{ i.precio_unitario }}</td>
+        <td><strong>${{ i.stock * i.precio_unitario }}</strong></td>
+        <td>
+          <a href="{{ url_for('inventario_view', id=i._id) }}" class="btn btn-sm btn-info">Ver</a>
+          <a href="{{ url_for('inventario_edit', id=i._id) }}" class="btn btn-sm btn-warning">Editar</a>
+          <form action="{{ url_for('inventario_delete', id=i._id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar?')">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-info text-center py-5">
+  <p class="mb-0">No hay productos en inventario. <a href="{{ url_for('inventario_new') }}">Agregar uno</a></p>
+</div>
+{% endif %}
+{% endblock %}

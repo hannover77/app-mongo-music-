@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Ventas - Música Vintage{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2>💰 Ventas</h2>
+    <small class="text-muted">📚 Cliente y Artista obtenidos por consultas por referencia ($lookup)</small>
+  </div>
+  <a href="{{ url_for('ventas_new') }}" class="btn btn-success">+ Nueva Venta</a>
+</div>
+
+{% if ventas %}
+<div class="alert alert-info mb-3">
+  <strong>ℹ️ Nota:</strong> Los nombres de cliente y artista se obtienen dinámicamente usando <code>$lookup</code> desde sus respectivas colecciones.
+  Solo se guardan los IDs de referencia en la base de datos.
+</div>
+
+<div class="table-responsive">
+  <table class="table table-hover table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>👤 Cliente (JOIN)</th>
+        <th>🎤 Artista (JOIN)</th>
+        <th>📀 Álbum</th>
+        <th>📅 Fecha</th>
+        <th>📦 Cantidad</th>
+        <th>💵 Precio Unitario</th>
+        <th>💰 Total</th>
+        <th>⚙️ Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for v in ventas %}
+      <tr>
+        <td><strong>{{ loop.index }}</strong></td>
+        <td><span class="badge bg-primary">{{ v.nombre_cliente }}</span></td>
+        <td><span class="badge bg-info">{{ v.nombre_artista }}</span></td>
+        <td>{{ v.album }}</td>
+        <td>{{ v.fecha_venta.strftime('%d/%m/%Y') if v.fecha_venta else 'N/A' }}</td>
+        <td>{{ v.cantidad }}</td>
+        <td>${{ v.precio_unitario }}</td>
+        <td><strong>${{ v.cantidad * v.precio_unitario }}</strong></td>
+        <td>
+          <a href="{{ url_for('ventas_view', id=v._id) }}" class="btn btn-sm btn-info">Ver</a>
+          <a href="{{ url_for('ventas_edit', id=v._id) }}" class="btn btn-sm btn-warning">Editar</a>
+          <form action="{{ url_for('ventas_delete', id=v._id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar?')">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-info text-center py-5">
+  <p class="mb-0">No hay ventas registradas. <a href="{{ url_for('ventas_new') }}">Crear una</a></p>
+</div>
+{% endif %}
+{% endblock %}

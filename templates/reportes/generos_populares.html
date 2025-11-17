@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block title %}Géneros Populares - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h2>🎵 Géneros Populares</h2>
+    <small class="text-muted">Agregación usando <code>$match</code>, <code>$group</code> y <code>$sum</code></small>
+  </div>
+  <div class="col-md-4">
+    <a href="{{ url_for('reportes') }}" class="btn btn-secondary">← Volver a Reportes</a>
+  </div>
+</div>
+
+<div class="alert alert-info">
+  <strong>ℹ️ Análisis de géneros musicales</strong>
+  <p class="mb-0 mt-2">Operadores usados:</p>
+  <ul class="mb-0 mt-2">
+    <li><code>$match</code> - Filtrar productos con género definido</li>
+    <li><code>$group</code> - Agrupar por género</li>
+    <li><code>$sum</code> - Sumar stock y valor total</li>
+    <li><code>$sort</code> - Ordenar por valor descendente</li>
+  </ul>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-hover table-sm">
+    <thead class="table-dark">
+      <tr>
+        <th>🎵 Género</th>
+        <th class="text-end">📦 Productos</th>
+        <th class="text-end">🎶 Stock Disponible</th>
+        <th class="text-end">💵 Valor Total</th>
+        <th class="text-end">💰 Valor Promedio</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if generos %}
+        {% for genero in generos %}
+          <tr>
+            <td>
+              <strong>{{ genero.genero }}</strong>
+              {% if genero.genero == "Rock" %}
+                <span class="ms-2">🎸</span>
+              {% elif genero.genero == "Jazz" %}
+                <span class="ms-2">🎷</span>
+              {% elif genero.genero == "Pop" %}
+                <span class="ms-2">🎤</span>
+              {% elif genero.genero == "Clásica" %}
+                <span class="ms-2">🎻</span>
+              {% elif genero.genero == "Hip-Hop" %}
+                <span class="ms-2">🎧</span>
+              {% elif genero.genero == "Electrónica" %}
+                <span class="ms-2">🔊</span>
+              {% else %}
+                <span class="ms-2">🎵</span>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              <span class="badge bg-info">{{ genero.cantidad_productos }}</span>
+            </td>
+            <td class="text-end">
+              <span class="badge bg-primary">{{ genero.stock_disponible }} unidades</span>
+            </td>
+            <td class="text-end">
+              <strong class="text-success">${{ "%.2f"|format(genero.valor_total) }}</strong>
+            </td>
+            <td class="text-end">
+              <span class="text-muted">${{ "%.2f"|format(genero.valor_promedio) }}</span>
+            </td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="5" class="text-center text-muted">No hay datos disponibles</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Resumen -->
+{% if generos %}
+  <div class="row mt-4">
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">🎵 Géneros</h5>
+          <h2 class="text-primary">{{ generos|length }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">📦 Total Stock</h5>
+          <h2 class="text-info">{{ generos|map(attribute='stock_disponible')|sum }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">💰 Valor Inventario</h5>
+          <h2 class="text-success">${{ "%.2f"|format(generos|map(attribute='valor_total')|sum) }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Géneros -->
+  {% if generos|length > 0 %}
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h5 class="mb-3">📊 Top 3 Géneros por Valor</h5>
+      </div>
+      {% for genero in generos[:3] %}
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header bg-primary text-white text-center">
+              <h4 class="mb-0">
+                {% if genero.genero == "Rock" %}
+                  🎸 Rock
+                {% elif genero.genero == "Jazz" %}
+                  🎷 Jazz
+                {% elif genero.genero == "Pop" %}
+                  🎤 Pop
+                {% elif genero.genero == "Clásica" %}
+                  🎻 Clásica
+                {% elif genero.genero == "Hip-Hop" %}
+                  🎧 Hip-Hop
+                {% elif genero.genero == "Electrónica" %}
+                  🔊 Electrónica
+                {% else %}
+                  🎵 {{ genero.genero }}
+                {% endif %}
+              </h4>
+            </div>
+            <div class="card-body">
+              <p class="mb-2">
+                <strong>Productos:</strong>
+                <span class="badge bg-info">{{ genero.cantidad_productos }}</span>
+              </p>
+              <p class="mb-2">
+                <strong>Stock:</strong>
+                <span class="badge bg-warning text-dark">{{ genero.stock_disponible }}</span>
+              </p>
+              <p class="mb-0">
+                <strong>Valor Total:</strong><br>
+                <span class="text-success" style="font-size: 1.3rem;">
+                  ${{ "%.2f"|format(genero.valor_total) }}
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endif %}
+
+<!-- Pipeline de Agregación -->
+<div class="mt-5">
+  <div class="card">
+    <div class="card-header">
+      <strong>🔍 Pipeline de Agregación MongoDB</strong>
+    </div>
+    <div class="card-body">
+      <pre><code>Inventario.aggregate([
+  {
+    "$match": {
+      "genero": { "$ne": null, "$ne": "" }
+    }
+  },
+  {
+    "$group": {
+      "_id": "$genero",
+      "cantidad_productos": { "$sum": 1 },
+      "stock_disponible": { "$sum": "$stock" },
+      "valor_total": { 
+        "$sum": { "$multiply": ["$stock", "$valor_unitario"] } 
+      }
+    }
+  },
+  {
+    "$project": {
+      "_id": 0,
+      "genero": "$_id",
+      "cantidad_productos": 1,
+      "stock_disponible": 1,
+      "valor_total": { "$round": ["$valor_total", 2] },
+      "valor_promedio": { 
+        "$round": [
+          { "$divide": ["$valor_total", "$cantidad_productos"] }, 
+          2
+        ] 
+      }
+    }
+  },
+  {
+    "$sort": { "valor_total": -1 }
+  }
+])</code></pre>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

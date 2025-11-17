@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Ver Producto - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h2>👁️ Detalle del Producto</h2>
+    <small class="text-muted">📚 Datos obtenidos por consulta por referencia (JOIN)</small>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card shadow mb-3">
+      <div class="card-header bg-info text-white">
+        <strong>🎤 Información del Artista (Obtenida por $lookup)</strong>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <p class="text-muted mb-0">Nombre del Artista</p>
+            <p class="h5"><strong>{{ item.nombre_artista }}</strong></p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted mb-0">ID del Artista (Referencia)</p>
+            <p class="small font-monospace text-muted">{{ item.artista_id }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow">
+      <div class="card-header bg-success text-white">
+        <strong>📀 Información del Producto</strong>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <p class="text-muted mb-0">Álbum</p>
+            <p class="h5">{{ item.album }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted mb-0">Año</p>
+            <p class="h5">{{ item.año }}</p>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <p class="text-muted mb-0">Género</p>
+            <p class="h5"><span class="badge bg-info">{{ item.genero if item.genero else 'N/A' }}</span></p>
+          </div>
+          <div class="col-md-4">
+            <p class="text-muted mb-0">Stock Disponible</p>
+            <p class="h5"><span class="badge {% if item.stock > 10 %}bg-success{% elif item.stock > 0 %}bg-warning{% else %}bg-danger{% endif %}">{{ item.stock }} unidades</span></p>
+          </div>
+          <div class="col-md-4">
+            <p class="text-muted mb-0">Precio Unitario</p>
+            <p class="h5"><strong>${{ item.precio_unitario }}</strong></p>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <p class="text-muted mb-0">Valor Total en Stock (Stock × Precio)</p>
+            <p class="h4 text-success"><strong>${{ item.stock * item.precio_unitario }}</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-4 d-flex gap-2">
+      <a href="{{ url_for('inventario_edit', id=item._id) }}" class="btn btn-warning">✏️ Editar</a>
+      <a href="{{ url_for('inventario_list') }}" class="btn btn-secondary">⬅️ Volver</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

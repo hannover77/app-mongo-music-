@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <!-- Seguridad: Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.jsdelivr.net; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;">
+  <title>{% block title %}Música Vintage{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <style>
+    :root {
+      --primary-color: #667eea;
+      --secondary-color: #764ba2;
+      --danger-color: #dc3545;
+      --success-color: #198754;
+    }
+    
+    * {
+      transition: all 0.3s ease;
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      min-height: 100vh;
+      padding-top: 70px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    nav {
+      background: rgba(0, 0, 0, 0.85) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(10px);
+    }
+    
+    nav a, nav button {
+      color: #fff !important;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+    
+    nav a:hover, nav button:hover {
+      color: var(--primary-color) !important;
+      transform: translateY(-2px);
+    }
+    
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    
+    .container-main {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      padding: 35px;
+      margin-top: 30px;
+      margin-bottom: 30px;
+      min-height: 500px;
+    }
+    
+    .alert {
+      margin-top: 20px;
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      animation: slideInDown 0.4s ease;
+    }
+    
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+      border-left: 5px solid var(--success-color);
+    }
+    
+    .alert-error, .alert-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+      border-left: 5px solid var(--danger-color);
+    }
+    
+    .alert-info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border-left: 5px solid #0c5460;
+    }
+    
+    .dropdown-menu {
+      border: none;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
+    }
+    
+    .badge {
+      padding: 0.6em 0.9em;
+      font-size: 0.85rem;
+      border-radius: 50px;
+      font-weight: 600;
+    }
+    
+    .badge.bg-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container-main {
+        padding: 20px;
+      }
+      
+      .navbar-brand {
+        font-size: 1.2rem;
+      }
+      
+      nav a {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-dark fixed-top navbar-expand-lg">
+  <div class="container-fluid px-3">
+    <a class="navbar-brand fw-bold" href="{{ url_for('index') }}" title="Ir a inicio">🎵 Música Vintage</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegación">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}" title="Página principal">🏠 Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('artistas_list') }}" title="Gestionar artistas">🎤 Artistas</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('clientes_list') }}" title="Gestionar clientes">👥 Clientes</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('inventario_list') }}" title="Gestionar inventario">📦 Inventario</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('ventas_list') }}" title="Ver ventas">💰 Ventas</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('reportes') }}" title="Ver reportes y análisis">📊 Reportes</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Menú de usuario">
+            👤 {{ session.get('nombre', 'Usuario') }}
+            <span class="badge bg-primary ms-2">{{ session.get('rol', '').upper() }}</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li><span class="dropdown-item-text text-muted"><small>Conectado como:</small></span></li>
+            <li><span class="dropdown-item-text"><strong>{{ session.get('usuario', '') }}</strong></span></li>
+            <li><span class="dropdown-item-text"><small>Rol: <strong class="text-primary">{{ session.get('rol', '').capitalize() }}</strong></small></span></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger fw-bold" href="{{ url_for('logout') }}" title="Cerrar sesión">🚪 Cerrar Sesión</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="container-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <strong>
+              {% if category == 'success' %}✅
+              {% elif category == 'error' or category == 'danger' %}❌
+              {% elif category == 'info' %}ℹ️
+              {% elif category == 'warning' %}⚠️
+              {% endif %}
+            </strong>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="text-center py-4 text-white mt-5" style="background: rgba(0,0,0,0.5);">
+  <p class="mb-1">🎵 Música Vintage &copy; 2024 - Sistema de Gestión</p>
+  <small class="text-muted">Todos los datos están protegidos</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Seguridad: Desactivar acceso a herramientas de desarrollo en producción
+// (Comentar en desarrollo)
+// document.addEventListener('keydown', function(e) {
+//   if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+//     e.preventDefault();
+//   }
+// });
+
+// Auto-cerrar alertas después de 5 segundos
+document.addEventListener('DOMContentLoaded', function() {
+  const alerts = document.querySelectorAll('.alert');
+  alerts.forEach(function(alert) {
+    setTimeout(function() {
+      const bsAlert = new bootstrap.Alert(alert);
+      bsAlert.close();
+    }, 5000);
+  });
+});
+</script>
+</body>
+</html>

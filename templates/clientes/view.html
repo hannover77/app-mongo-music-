@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Ver Cliente - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h2>👁️ Detalle del Cliente</h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card shadow">
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <p class="text-muted mb-0">Nombre</p>
+            <p class="h5">{{ item.nombre }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted mb-0">Correo</p>
+            <p class="h5"><a href="mailto:{{ item.correo }}">{{ item.correo }}</a></p>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <p class="text-muted mb-0">Teléfono</p>
+            <p class="h5">{{ item.telefono if item.telefono else 'N/A' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-4 d-flex gap-2">
+      <a href="{{ url_for('clientes_edit', id=item._id) }}" class="btn btn-warning">✏️ Editar</a>
+      <a href="{{ url_for('clientes_list') }}" class="btn btn-secondary">⬅️ Volver</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

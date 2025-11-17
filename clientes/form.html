@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if item else 'Nuevo' }} Cliente - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h2>{{ '✏️ Editar Cliente' if item else '➕ Nuevo Cliente' }}</h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <form method="post" class="needs-validation">
+      <div class="mb-3">
+        <label for="nombre" class="form-label fw-bold">Nombre *</label>
+        <input type="text" class="form-control" id="nombre" name="nombre" value="{{ item.nombre if item else '' }}" required>
+        <small class="text-muted">Nombre completo del cliente</small>
+      </div>
+      
+      <div class="mb-3">
+        <label for="correo" class="form-label fw-bold">Correo *</label>
+        <input type="email" class="form-control" id="correo" name="correo" value="{{ item.correo if item else '' }}" required>
+        <small class="text-muted">Email del cliente</small>
+      </div>
+      
+      <div class="mb-3">
+        <label for="telefono" class="form-label fw-bold">Teléfono</label>
+        <input type="text" class="form-control" id="telefono" name="telefono" value="{{ item.telefono if item else '' }}">
+        <small class="text-muted">Número de contacto (opcional)</small>
+      </div>
+      
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success btn-lg">💾 Guardar</button>
+        <a href="{{ url_for('clientes_list') }}" class="btn btn-secondary btn-lg">❌ Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

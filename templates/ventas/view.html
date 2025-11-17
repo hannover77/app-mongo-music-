@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Ver Venta - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h2>👁️ Detalle de la Venta</h2>
+    <small class="text-muted">📚 Datos obtenidos por consultas por referencia (JOINs)</small>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <!-- CLIENTE - Obtenido por $lookup -->
+    <div class="card shadow mb-3">
+      <div class="card-header bg-primary text-white">
+        <strong>👤 Información del Cliente (Obtenida por $lookup)</strong>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <p class="text-muted mb-0">Nombre del Cliente</p>
+            <p class="h5"><strong>{{ item.nombre_cliente }}</strong></p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted mb-0">ID del Cliente (Referencia)</p>
+            <p class="small font-monospace text-muted">{{ item.cliente_id }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARTISTA - Obtenido por $lookup -->
+    <div class="card shadow mb-3">
+      <div class="card-header bg-info text-white">
+        <strong>🎤 Información del Artista (Obtenida por $lookup)</strong>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <p class="text-muted mb-0">Nombre del Artista</p>
+            <p class="h5"><strong>{{ item.nombre_artista }}</strong></p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted mb-0">ID del Artista (Referencia)</p>
+            <p class="small font-monospace text-muted">{{ item.artista_id }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETALLES DE LA VENTA -->
+    <div class="card shadow">
+      <div class="card-header bg-success text-white">
+        <strong>📋 Detalles de la Venta</strong>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <p class="text-muted mb-0">Álbum</p>
+            <p class="h5">{{ item.album }}</p>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <p class="text-muted mb-0">Fecha de Venta</p>
+            <p class="h5">{{ item.fecha_venta.strftime('%d/%m/%Y') if item.fecha_venta else 'N/A' }}</p>
+          </div>
+          <div class="col-md-4">
+            <p class="text-muted mb-0">Cantidad</p>
+            <p class="h5">{{ item.cantidad }} unidad(es)</p>
+          </div>
+          <div class="col-md-4">
+            <p class="text-muted mb-0">Precio Unitario</p>
+            <p class="h5"><strong>${{ item.precio_unitario }}</strong></p>
+          </div>
+        </div>
+        
+        <div class="row mb-3 p-3 bg-light rounded border-2 border-success">
+          <div class="col-md-12">
+            <p class="text-muted mb-0 fs-6">💰 TOTAL DE LA VENTA (Cantidad × Precio)</p>
+            <p class="h3 text-success fw-bold">${{ item.cantidad * item.precio_unitario }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-4 d-flex gap-2">
+      <a href="{{ url_for('ventas_edit', id=item._id) }}" class="btn btn-warning">✏️ Editar</a>
+      <a href="{{ url_for('ventas_list') }}" class="btn btn-secondary">⬅️ Volver</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

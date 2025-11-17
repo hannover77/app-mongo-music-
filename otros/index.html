@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Inicio - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-5">
+  <div class="col-md-12">
+    <h1 class="display-4 mb-3">Bienvenido a Música Vintage 🎵</h1>
+    <p class="lead">Gestiona tu tienda de música vintage con nuestro sistema de gestión completo.</p>
+    
+    <!-- Tarjeta de Información del Rol -->
+    <div class="alert alert-info border-2 border-primary mt-3" style="border-radius: 10px;">
+      <h5 class="mb-2">ℹ️ Tu Rol: <strong>{{ session.get('rol', '').upper() }}</strong></h5>
+      {% if session.get('rol') == 'administrador' %}
+        <p class="mb-0">✅ Tienes acceso completo a todas las funciones: <strong>Consulta, Crear, Editar y Eliminar</strong></p>
+      {% elif session.get('rol') == 'consulta' %}
+        <p class="mb-0">👀 Solo puedes <strong>consultar</strong> datos. Sin permisos para crear, editar o eliminar.</p>
+      {% elif session.get('rol') == 'operativo' %}
+        <p class="mb-0">📝 Puedes <strong>consultar</strong> y <strong>crear</strong> registros. No puedes editar ni eliminar.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-6 col-lg-3">
+    <div class="card h-100 shadow-sm border-0" style="border-top: 4px solid #667eea;">
+      <div class="card-body text-center">
+        <h5 class="card-title">👨‍🎤 Artistas</h5>
+        <p class="card-text">Gestiona los artistas de tu catálogo</p>
+        <a href="{{ url_for('artistas_list') }}" class="btn btn-primary">Ver Artistas</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="card h-100 shadow-sm border-0" style="border-top: 4px solid #764ba2;">
+      <div class="card-body text-center">
+        <h5 class="card-title">👥 Clientes</h5>
+        <p class="card-text">Administra tus clientes</p>
+        <a href="{{ url_for('clientes_list') }}" class="btn btn-primary">Ver Clientes</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="card h-100 shadow-sm border-0" style="border-top: 4px solid #f093fb;">
+      <div class="card-body text-center">
+        <h5 class="card-title">📦 Inventario</h5>
+        <p class="card-text">Controla tu stock disponible</p>
+        <a href="{{ url_for('inventario_list') }}" class="btn btn-primary">Ver Inventario</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="card h-100 shadow-sm border-0" style="border-top: 4px solid #4facfe;">
+      <div class="card-body text-center">
+        <h5 class="card-title">💰 Ventas</h5>
+        <p class="card-text">Registra todas tus ventas</p>
+        <a href="{{ url_for('ventas_list') }}" class="btn btn-primary">Ver Ventas</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

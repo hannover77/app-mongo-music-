@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if item else 'Nuevo' }} Artista - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h2>{{ '✏️ Editar Artista' if item else '➕ Nuevo Artista' }}</h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <form method="post" class="needs-validation">
+      <div class="mb-3">
+        <label for="nombre" class="form-label fw-bold">Nombre *</label>
+        <input type="text" class="form-control" id="nombre" name="nombre" value="{{ item.nombre if item else '' }}" required>
+        <small class="text-muted">Nombre del artista</small>
+      </div>
+      
+      <div class="mb-3">
+        <label for="pais" class="form-label fw-bold">País</label>
+        <input type="text" class="form-control" id="pais" name="pais" value="{{ item.pais if item else '' }}">
+        <small class="text-muted">País de origen</small>
+      </div>
+      
+      <div class="mb-3">
+        <label for="genero" class="form-label fw-bold">Género</label>
+        <select class="form-control" id="genero" name="genero">
+          <option value="">-- Seleccionar --</option>
+          <option value="Rock" {% if item and item.genero == 'Rock' %}selected{% endif %}>Rock</option>
+          <option value="Pop" {% if item and item.genero == 'Pop' %}selected{% endif %}>Pop</option>
+          <option value="Jazz" {% if item and item.genero == 'Jazz' %}selected{% endif %}>Jazz</option>
+          <option value="Clásico" {% if item and item.genero == 'Clásico' %}selected{% endif %}>Clásico</option>
+          <option value="Otro" {% if item and item.genero == 'Otro' %}selected{% endif %}>Otro</option>
+        </select>
+      </div>
+      
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="activo" name="activo" {% if item and item.activo %}checked{% endif %}>
+        <label class="form-check-label fw-bold" for="activo">Activo</label>
+      </div>
+      
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success btn-lg">💾 Guardar</button>
+        <a href="{{ url_for('artistas_list') }}" class="btn btn-secondary btn-lg">❌ Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

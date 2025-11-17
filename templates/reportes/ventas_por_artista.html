@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Ventas por Artista - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h2>🎤💰 Ventas por Artista</h2>
+    <small class="text-muted">Agregación usando <code>$match</code>, <code>$group</code>, <code>$sum</code> y <code>$project</code></small>
+  </div>
+  <div class="col-md-4">
+    <a href="{{ url_for('reportes') }}" class="btn btn-secondary">← Volver a Reportes</a>
+  </div>
+</div>
+
+<div class="alert alert-info">
+  <strong>ℹ️ Operadores usados:</strong>
+  <ul class="mb-0 mt-2">
+    <li><code>$match</code> - Filtrar ventas con cantidad > 0</li>
+    <li><code>$group</code> - Agrupar por artista_id</li>
+    <li><code>$sum</code> - Sumar unidades e ingresos (cantidad × precio)</li>
+    <li><code>$project</code> - Seleccionar y transformar campos</li>
+  </ul>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-hover table-sm">
+    <thead class="table-dark">
+      <tr>
+        <th>🎤 Artista</th>
+        <th class="text-end">📦 Unidades Vendidas</th>
+        <th class="text-end">💵 Ingresos Totales</th>
+        <th class="text-end">📊 Transacciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if ventas %}
+        {% for venta in ventas %}
+          <tr>
+            <td>
+              <strong>{{ venta.artista }}</strong>
+            </td>
+            <td class="text-end">
+              <span class="badge bg-info">{{ venta.unidades }}</span>
+            </td>
+            <td class="text-end">
+              <span class="badge bg-success">${{ "%.2f"|format(venta.ingresos) }}</span>
+            </td>
+            <td class="text-end">
+              <span class="badge bg-primary">{{ venta.transacciones }}</span>
+            </td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="4" class="text-center text-muted">No hay datos disponibles</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Resumen -->
+{% if ventas %}
+  <div class="row mt-4">
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">📊 Artistas</h5>
+          <h2 class="text-primary">{{ ventas|length }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">📦 Total Unidades</h5>
+          <h2 class="text-info">{{ ventas|map(attribute='unidades')|sum }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">💰 Ingresos Totales</h5>
+          <h2 class="text-success">${{ "%.2f"|format(ventas|map(attribute='ingresos')|sum) }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<!-- Pipeline de Agregación -->
+<div class="mt-5">
+  <div class="card">
+    <div class="card-header">
+      <strong>🔍 Pipeline de Agregación MongoDB</strong>
+    </div>
+    <div class="card-body">
+      <pre><code>Ventas.aggregate([
+  {
+    "$match": {
+      "cantidad": { "$gt": 0 }
+    }
+  },
+  {
+    "$lookup": {
+      "from": "artistas",
+      "localField": "artista_id",
+      "foreignField": "_id",
+      "as": "artista"
+    }
+  },
+  {
+    "$unwind": {
+      "path": "$artista",
+      "preserveNullAndEmptyArrays": true
+    }
+  },
+  {
+    "$group": {
+      "_id": "$artista_id",
+      "artista_nombre": { "$first": "$artista.nombre" },
+      "unidades_vendidas": { "$sum": "$cantidad" },
+      "ingresos": {
+        "$sum": { "$multiply": ["$cantidad", "$precio_unitario"] }
+      },
+      "transacciones": { "$sum": 1 }
+    }
+  },
+  {
+    "$project": {
+      "_id": 0,
+      "artista": { "$ifNull": ["$artista_nombre", "Desconocido"] },
+      "unidades": "$unidades_vendidas",
+      "ingresos": { "$round": ["$ingresos", 2] },
+      "transacciones": 1
+    }
+  },
+  {
+    "$sort": { "ingresos": -1 }
+  }
+])</code></pre>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

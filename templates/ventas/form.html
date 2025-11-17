@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if item else 'Nueva' }} Venta - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h2>{{ '✏️ Editar Venta' if item else '➕ Nueva Venta' }}</h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <form method="post" class="needs-validation">
+      <div class="mb-3">
+        <label for="cliente_id" class="form-label fw-bold">Cliente * (Selecciona el cliente)</label>
+        <select class="form-select" id="cliente_id" name="cliente_id" required onchange="actualizarNombreCliente()">
+          <option value="">-- Seleccionar Cliente --</option>
+          {% for c in clientes %}
+          <option value="{{ c._id }}" {% if item and item.cliente_id == c._id %}selected{% endif %}>{{ c.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="mb-3">
+        <label for="nombre_cliente" class="form-label fw-bold">Nombre Cliente (Auto)</label>
+        <input type="text" class="form-control" id="nombre_cliente" name="nombre_cliente" value="{{ item.nombre_cliente if item else '' }}" readonly>
+        <small class="text-muted">Se completa automáticamente</small>
+      </div>
+      
+      <div class="mb-3">
+        <label for="artista_id" class="form-label fw-bold">Artista * (Selecciona el artista)</label>
+        <select class="form-select" id="artista_id" name="artista_id" required onchange="actualizarNombreArtista()">
+          <option value="">-- Seleccionar Artista --</option>
+          {% for a in artistas %}
+          <option value="{{ a._id }}" {% if item and item.artista_id == a._id %}selected{% endif %}>{{ a.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="mb-3">
+        <label for="nombre_artista" class="form-label fw-bold">Nombre Artista (Auto)</label>
+        <input type="text" class="form-control" id="nombre_artista" name="nombre_artista" value="{{ item.nombre_artista if item else '' }}" readonly>
+        <small class="text-muted">Se completa automáticamente</small>
+      </div>
+      
+      <div class="mb-3">
+        <label for="album" class="form-label fw-bold">Álbum *</label>
+        <input type="text" class="form-control" id="album" name="album" value="{{ item.album if item else '' }}" required>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="fecha_venta" class="form-label fw-bold">Fecha de Venta *</label>
+            <input type="date" class="form-control" id="fecha_venta" name="fecha_venta" value="{{ item.fecha_venta.strftime('%Y-%m-%d') if item and item.fecha_venta else '' }}" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="cantidad" class="form-label fw-bold">Cantidad *</label>
+            <input type="number" class="form-control" id="cantidad" name="cantidad" value="{{ item.cantidad if item else 1 }}" required min="1">
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-3">
+        <label for="precio_unitario" class="form-label fw-bold">Precio Unitario *</label>
+        <input type="number" class="form-control" id="precio_unitario" name="precio_unitario" value="{{ item.precio_unitario if item else 0 }}" required min="0" step="0.01">
+      </div>
+      
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success btn-lg">💾 Guardar Venta</button>
+        <a href="{{ url_for('ventas_list') }}" class="btn btn-secondary btn-lg">❌ Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function actualizarNombreCliente() {
+  const select = document.getElementById('cliente_id');
+  const nombreInput = document.getElementById('nombre_cliente');
+  
+  if (select.value) {
+    const textoSeleccionado = select.options[select.selectedIndex].text;
+    nombreInput.value = textoSeleccionado;
+  } else {
+    nombreInput.value = '';
+  }
+}
+
+function actualizarNombreArtista() {
+  const select = document.getElementById('artista_id');
+  const nombreInput = document.getElementById('nombre_artista');
+  
+  if (select.value) {
+    const textoSeleccionado = select.options[select.selectedIndex].text;
+    nombreInput.value = textoSeleccionado;
+  } else {
+    nombreInput.value = '';
+  }
+}
+
+// Al cargar la página, si hay valores seleccionados, actualizar los nombres
+document.addEventListener('DOMContentLoaded', function() {
+  if (document.getElementById('cliente_id').value) {
+    actualizarNombreCliente();
+  }
+  if (document.getElementById('artista_id').value) {
+    actualizarNombreArtista();
+  }
+});
+</script>
+{% endblock %}

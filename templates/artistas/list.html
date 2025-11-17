@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Artistas - Música Vintage{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>👨‍🎤 Artistas</h2>
+  <a href="{{ url_for('artistas_new') }}" class="btn btn-success">+ Nuevo Artista</a>
+</div>
+
+{% if artistas %}
+<div class="table-responsive">
+  <table class="table table-hover table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>Nombre</th>
+        <th>País</th>
+        <th>Género</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in artistas %}
+      <tr>
+        <td><strong>{{ loop.index }}</strong></td>
+        <td>{{ a.nombre }}</td>
+        <td>{{ a.pais }}</td>
+        <td><span class="badge bg-info">{{ a.genero }}</span></td>
+        <td>
+          {% if a.activo %}
+            <span class="badge bg-success">Activo</span>
+          {% else %}
+            <span class="badge bg-secondary">Inactivo</span>
+          {% endif %}
+        </td>
+        <td>
+          <a href="{{ url_for('artistas_view', id=a._id) }}" class="btn btn-sm btn-info">Ver</a>
+          <a href="{{ url_for('artistas_edit', id=a._id) }}" class="btn btn-sm btn-warning">Editar</a>
+          <form action="{{ url_for('artistas_delete', id=a._id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar?')">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-info text-center py-5">
+  <p class="mb-0">No hay artistas registrados. <a href="{{ url_for('artistas_new') }}">Crear uno</a></p>
+</div>
+{% endif %}
+{% endblock %}

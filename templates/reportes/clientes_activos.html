@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}Clientes Activos - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h2>👥💰 Clientes Activos</h2>
+    <small class="text-muted">Agregación usando <code>$match</code>, <code>$group</code> y <code>$sum</code></small>
+  </div>
+  <div class="col-md-4">
+    <a href="{{ url_for('reportes') }}" class="btn btn-secondary">← Volver a Reportes</a>
+  </div>
+</div>
+
+<div class="alert alert-info">
+  <strong>ℹ️ Clientes ordenados por volumen de compras</strong>
+  <p class="mb-0 mt-2">Operadores usados:</p>
+  <ul class="mb-0 mt-2">
+    <li><code>$match</code> - Filtrar clientes con compras</li>
+    <li><code>$group</code> - Agrupar por cliente_id</li>
+    <li><code>$sum</code> - Sumar cantidad de artículos y gasto total</li>
+    <li><code>$sort</code> - Ordenar por gasto descendente</li>
+  </ul>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-hover table-sm">
+    <thead class="table-dark">
+      <tr>
+        <th>👥 Cliente</th>
+        <th class="text-end">🛒 Compras</th>
+        <th class="text-end">📦 Artículos</th>
+        <th class="text-end">💵 Gasto Total</th>
+        <th class="text-center">🏆 Ranking</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if clientes %}
+        {% for cliente in clientes %}
+          <tr>
+            <td>
+              <strong>{{ cliente.cliente_nombre }}</strong>
+              <br>
+              <small class="text-muted">ID: {{ cliente.cliente_id }}</small>
+            </td>
+            <td class="text-end">
+              <span class="badge bg-primary">{{ cliente.compras }}</span>
+            </td>
+            <td class="text-end">
+              <span class="badge bg-info">{{ cliente.cantidad_articulos }}</span>
+            </td>
+            <td class="text-end">
+              <strong class="text-success">${{ "%.2f"|format(cliente.gasto_total) }}</strong>
+            </td>
+            <td class="text-center">
+              {% if loop.index == 1 %}
+                <span class="badge bg-gold" title="Top Cliente">🥇 #1</span>
+              {% elif loop.index == 2 %}
+                <span class="badge bg-silver" title="2do Cliente">🥈 #2</span>
+              {% elif loop.index == 3 %}
+                <span class="badge bg-bronze" title="3er Cliente">🥉 #3</span>
+              {% else %}
+                <span class="badge bg-secondary">#{{ loop.index }}</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="5" class="text-center text-muted">No hay datos disponibles</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Estilos para medallas -->
+<style>
+  .bg-gold { background: linear-gradient(135deg, #ffd700, #ffa500) !important; color: #333 !important; }
+  .bg-silver { background: linear-gradient(135deg, #c0c0c0, #a9a9a9) !important; color: #333 !important; }
+  .bg-bronze { background: linear-gradient(135deg, #cd7f32, #b87333) !important; color: #fff !important; }
+</style>
+
+<!-- Resumen -->
+{% if clientes %}
+  <div class="row mt-4">
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">👥 Clientes Activos</h5>
+          <h2 class="text-primary">{{ clientes|length }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">🛒 Total Compras</h5>
+          <h2 class="text-info">{{ clientes|map(attribute='compras')|sum }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">💰 Gasto Total</h5>
+          <h2 class="text-success">${{ "%.2f"|format(clientes|map(attribute='gasto_total')|sum) }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top 3 Clientes -->
+  {% if clientes|length > 0 %}
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h5 class="mb-3">🏆 Top 3 Clientes por Gasto</h5>
+      </div>
+      {% for cliente in clientes[:3] %}
+        <div class="col-md-4">
+          <div class="card border-2 {% if loop.index == 1 %}border-warning{% elif loop.index == 2 %}border-secondary{% else %}border-info{% endif %}">
+            <div class="card-body text-center">
+              <h3>
+                {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}
+                Lugar #{{ loop.index }}
+              </h3>
+              <h5>{{ cliente.cliente_nombre }}</h5>
+              <p class="text-muted">{{ cliente.compras }} compras</p>
+              <h4 class="text-success">${{ "%.2f"|format(cliente.gasto_total) }}</h4>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endif %}
+
+<!-- Pipeline de Agregación -->
+<div class="mt-5">
+  <div class="card">
+    <div class="card-header">
+      <strong>🔍 Pipeline de Agregación MongoDB</strong>
+    </div>
+    <div class="card-body">
+      <pre><code>Ventas.aggregate([
+  {
+    "$match": {
+      "cliente_id": { "$exists": true },
+      "cantidad": { "$gt": 0 }
+    }
+  },
+  {
+    "$group": {
+      "_id": "$cliente_id",
+      "cliente_nombre": { "$first": "$cliente_nombre" },
+      "compras": { "$sum": 1 },
+      "cantidad_articulos": { "$sum": "$cantidad" },
+      "gasto_total": { 
+        "$sum": { "$multiply": ["$cantidad", "$precio_unitario"] } 
+      }
+    }
+  },
+  {
+    "$project": {
+      "_id": 0,
+      "cliente_id": "$_id",
+      "cliente_nombre": 1,
+      "compras": 1,
+      "cantidad_articulos": 1,
+      "gasto_total": { "$round": ["$gasto_total", 2] }
+    }
+  },
+  {
+    "$sort": { "gasto_total": -1 }
+  }
+])</code></pre>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

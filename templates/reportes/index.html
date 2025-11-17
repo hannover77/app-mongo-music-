@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Reportes - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-12">
+    <h1 class="display-5 mb-3">📊 Reportes y Análisis</h1>
+    <p class="text-muted">Genera reportes detallados usando agregaciones MongoDB</p>
+  </div>
+</div>
+
+<div class="alert alert-info mb-4">
+  <strong>ℹ️ Información:</strong> Todos los reportes utilizan operadores de agregación de MongoDB: <code>$match</code>, <code>$group</code>, <code>$sum</code>, <code>$project</code>, <code>$count</code>
+</div>
+
+<div class="row">
+  <!-- Estadísticas Generales -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card shadow-sm h-100" style="border-top: 4px solid #667eea;">
+      <div class="card-body">
+        <h5 class="card-title">📈 Estadísticas Generales</h5>
+        <p class="card-text text-muted">Resumen general del sistema con conteos y totales</p>
+        <ul class="small text-muted">
+          <li>✅ Operadores: <code>$count</code>, <code>$sum</code>, <code>$group</code></li>
+          <li>Total de artistas, clientes, productos</li>
+          <li>Ingresos totales y stock disponible</li>
+        </ul>
+      </div>
+      <div class="card-footer bg-light">
+        <a href="{{ url_for('estadisticas') }}" class="btn btn-sm btn-primary w-100">Ver Estadísticas →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ventas por Artista -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card shadow-sm h-100" style="border-top: 4px solid #764ba2;">
+      <div class="card-body">
+        <h5 class="card-title">🎤 Ventas por Artista</h5>
+        <p class="card-text text-muted">Análisis de desempeño por artista</p>
+        <ul class="small text-muted">
+          <li>✅ Operadores: <code>$match</code>, <code>$group</code>, <code>$project</code></li>
+          <li>Unidades vendidas por artista</li>
+          <li>Ingresos generados y transacciones</li>
+        </ul>
+      </div>
+      <div class="card-footer bg-light">
+        <a href="{{ url_for('ventas_por_artista') }}" class="btn btn-sm btn-primary w-100">Ver Reporte →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inventario Bajo Stock -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card shadow-sm h-100" style="border-top: 4px solid #dc3545;">
+      <div class="card-body">
+        <h5 class="card-title">📦 Inventario Bajo Stock</h5>
+        <p class="card-text text-muted">Productos que necesitan reabastecimiento</p>
+        <ul class="small text-muted">
+          <li>✅ Operadores: <code>$match</code>, <code>$project</code>, <code>$lookup</code></li>
+          <li>Stock menor a 5 unidades</li>
+          <li>Valor total del stock bajo</li>
+        </ul>
+      </div>
+      <div class="card-footer bg-light">
+        <a href="{{ url_for('inventario_bajo') }}" class="btn btn-sm btn-warning w-100">Ver Productos →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clientes Activos -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card shadow-sm h-100" style="border-top: 4px solid #198754;">
+      <div class="card-body">
+        <h5 class="card-title">👥 Clientes Más Activos</h5>
+        <p class="card-text text-muted">Clientes con mayor volumen de compras</p>
+        <ul class="small text-muted">
+          <li>✅ Operadores: <code>$match</code>, <code>$group</code>, <code>$sum</code></li>
+          <li>Número de compras por cliente</li>
+          <li>Gasto total y cantidad de artículos</li>
+        </ul>
+      </div>
+      <div class="card-footer bg-light">
+        <a href="{{ url_for('clientes_activos') }}" class="btn btn-sm btn-success w-100">Ver Clientes →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Géneros Populares -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card shadow-sm h-100" style="border-top: 4px solid #fd7e14;">
+      <div class="card-body">
+        <h5 class="card-title">🎵 Géneros Populares</h5>
+        <p class="card-text text-muted">Análisis de géneros musicales en inventario</p>
+        <ul class="small text-muted">
+          <li>✅ Operadores: <code>$match</code>, <code>$group</code>, <code>$project</code></li>
+          <li>Stock por género musical</li>
+          <li>Cantidad de productos y valor total</li>
+        </ul>
+      </div>
+      <div class="card-footer bg-light">
+        <a href="{{ url_for('generos_populares') }}" class="btn btn-sm btn-info w-100">Ver Géneros →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Información de Agregaciones -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card shadow-sm h-100 bg-light">
+      <div class="card-body">
+        <h5 class="card-title">💡 Operadores MongoDB</h5>
+        <p class="card-text text-muted">Aprende sobre agregaciones</p>
+        <ul class="small">
+          <li><strong>$match:</strong> Filtra documentos</li>
+          <li><strong>$group:</strong> Agrupa por campo</li>
+          <li><strong>$sum:</strong> Suma valores</li>
+          <li><strong>$project:</strong> Selecciona campos</li>
+          <li><strong>$count:</strong> Cuenta documentos</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-5">
+  <div class="alert alert-success">
+    <strong>✅ Todos los reportes implementan correctamente los operadores de agregación de MongoDB</strong>
+  </div>
+</div>
+
+{% endblock %}

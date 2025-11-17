@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if item else 'Nuevo' }} Producto - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h2>{{ '✏️ Editar Producto' if item else '➕ Nuevo Producto' }}</h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <form method="post" class="needs-validation">
+      <div class="mb-3">
+        <label for="artista_id" class="form-label fw-bold">Artista * (Selecciona el artista del producto)</label>
+        <select class="form-select" id="artista_id" name="artista_id" required onchange="actualizarNombreArtista()">
+          <option value="">-- Selecciona un artista --</option>
+          {% for artista in artistas %}
+          <option value="{{ artista._id }}" {% if item and item.artista_id == artista._id %}selected{% endif %}>
+            {{ artista.nombre }} ({{ artista.pais }})
+          </option>
+          {% endfor %}
+        </select>
+        <small class="text-muted">El nombre se completará automáticamente</small>
+      </div>
+      
+      <div class="mb-3">
+        <label for="nombre_artista" class="form-label fw-bold">Nombre Artista (Auto)</label>
+        <input type="text" class="form-control" id="nombre_artista" name="nombre_artista" value="{{ item.nombre_artista if item else '' }}" readonly>
+        <small class="text-muted">Se completa automáticamente al seleccionar artista</small>
+      </div>
+      
+      <div class="mb-3">
+        <label for="album" class="form-label fw-bold">Álbum *</label>
+        <input type="text" class="form-control" id="album" name="album" value="{{ item.album if item else '' }}" required>
+        <small class="text-muted">Nombre del álbum</small>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="año" class="form-label fw-bold">Año *</label>
+            <input type="number" class="form-control" id="año" name="año" value="{{ item.año if item else '' }}" required min="1900" max="2100">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="genero" class="form-label fw-bold">Género</label>
+            <input type="text" class="form-control" id="genero" name="genero" value="{{ item.genero if item else '' }}">
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="stock" class="form-label fw-bold">Stock *</label>
+            <input type="number" class="form-control" id="stock" name="stock" value="{{ item.stock if item else 0 }}" required min="0">
+            <small class="text-muted">Cantidad disponible</small>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="precio_unitario" class="form-label fw-bold">Precio Unitario *</label>
+            <input type="number" class="form-control" id="precio_unitario" name="precio_unitario" value="{{ item.precio_unitario if item else 0 }}" required min="0" step="0.01">
+            <small class="text-muted">Precio en dólares</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success btn-lg">💾 Guardar</button>
+        <a href="{{ url_for('inventario_list') }}" class="btn btn-secondary btn-lg">❌ Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function actualizarNombreArtista() {
+  const select = document.getElementById('artista_id');
+  const nombreInput = document.getElementById('nombre_artista');
+  
+  if (select.value) {
+    const textoSeleccionado = select.options[select.selectedIndex].text;
+    // Extrae el nombre sin el país
+    const nombre = textoSeleccionado.split('(')[0].trim();
+    nombreInput.value = nombre;
+  } else {
+    nombreInput.value = '';
+  }
+}
+
+// Al cargar la página, si hay un artista seleccionado, actualizar el nombre
+document.addEventListener('DOMContentLoaded', function() {
+  if (document.getElementById('artista_id').value) {
+    actualizarNombreArtista();
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Clientes - Música Vintage{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>👥 Clientes</h2>
+  <a href="{{ url_for('clientes_new') }}" class="btn btn-success">+ Nuevo Cliente</a>
+</div>
+
+{% if clientes %}
+<div class="table-responsive">
+  <table class="table table-hover table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Teléfono</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in clientes %}
+      <tr>
+        <td><strong>{{ loop.index }}</strong></td>
+        <td>{{ c.nombre }}</td>
+        <td><a href="mailto:{{ c.correo }}">{{ c.correo }}</a></td>
+        <td>{{ c.telefono if c.telefono else 'N/A' }}</td>
+        <td>
+          <a href="{{ url_for('clientes_view', id=c._id) }}" class="btn btn-sm btn-info">Ver</a>
+          <a href="{{ url_for('clientes_edit', id=c._id) }}" class="btn btn-sm btn-warning">Editar</a>
+          <form action="{{ url_for('clientes_delete', id=c._id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar?')">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-info text-center py-5">
+  <p class="mb-0">No hay clientes registrados. <a href="{{ url_for('clientes_new') }}">Crear uno</a></p>
+</div>
+{% endif %}
+{% endblock %}

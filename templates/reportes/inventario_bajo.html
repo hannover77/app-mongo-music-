@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Inventario Bajo Stock - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h2>⚠️ Inventario Bajo Stock</h2>
+    <small class="text-muted">Agregación usando <code>$match</code>, <code>$lookup</code> y <code>$project</code></small>
+  </div>
+  <div class="col-md-4 text-end">
+    <a href="{{ url_for('reportes') }}" class="btn btn-secondary">← Volver a Reportes</a>
+  </div>
+</div>
+
+<div class="alert alert-warning">
+  <strong>⚠️ Productos con stock menor a 5 unidades</strong>
+  <p class="mb-0 mt-2">Operadores usados:</p>
+  <ul class="mb-0 mt-2">
+    <li><code>$match</code> - Filtrar productos con stock < 5</li>
+    <li><code>$lookup</code> - Obtener información del artista</li>
+    <li><code>$project</code> - Seleccionar y transformar campos</li>
+  </ul>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-hover table-sm">
+    <thead class="table-danger">
+      <tr>
+        <th>📀 Producto</th>
+        <th>🎤 Artista</th>
+        <th class="text-center">📦 Stock</th>
+        <th class="text-end">💵 Valor Unitario</th>
+        <th class="text-end">💰 Valor Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if productos %}
+        {% for producto in productos %}
+          <tr class="{% if producto.stock == 0 %}table-danger{% elif producto.stock < 3 %}table-warning{% else %}table-info{% endif %}">
+            <td>
+              <strong>{{ producto.nombre }}</strong>
+              <br>
+              <small class="text-muted">ID: {{ producto._id }}</small>
+            </td>
+            <td>
+              <span class="badge bg-primary">
+                {{ producto.artista_nombre if producto.artista_nombre else 'N/A' }}
+              </span>
+            </td>
+            <td class="text-center">
+              {% if producto.stock == 0 %}
+                <span class="badge bg-danger">AGOTADO (0)</span>
+              {% elif producto.stock < 3 %}
+                <span class="badge bg-danger">{{ producto.stock }} ⚠️</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">{{ producto.stock }}</span>
+              {% endif %}
+            </td>
+            <td class="text-end">${{ "%.2f"|format(producto.precio_unitario) }}</td>
+            <td class="text-end">
+              <strong>${{ "%.2f"|format(producto.valor_total) }}</strong>
+            </td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="5" class="text-center text-success">
+            ✅ Felicidades! Todos los productos tienen stock adecuado
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Resumen -->
+{% if productos %}
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">⚠️ Productos Bajo Stock</h5>
+          <h2 class="text-danger">{{ productos|length }}</h2>
+          <p class="text-muted">Requieren reabastecimiento</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">💰 Valor en Inventario Bajo</h5>
+          <h2 class="text-warning">${{ "%.2f"|format(productos|map(attribute='valor_total')|sum) }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Crítico vs Bajo -->
+  <div class="row mt-3">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-danger text-white">
+          <strong>🔴 Crítico (0 unidades)</strong>
+        </div>
+        <div class="card-body">
+          <h3 class="text-danger">
+            {{ productos|selectattr('stock', 'equalto', 0)|list|length }}
+            {% if productos|selectattr('stock', 'equalto', 0)|list|length == 1 %}
+              producto
+            {% else %}
+              productos
+            {% endif %}
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-warning text-dark">
+          <strong>🟡 Bajo (1-4 unidades)</strong>
+        </div>
+        <div class="card-body">
+          <h3 class="text-warning">
+            {{ productos|selectattr('stock', 'lessthan', 5)|selectattr('stock', 'greaterthan', 0)|list|length }}
+            {% if productos|selectattr('stock', 'lessthan', 5)|selectattr('stock', 'greaterthan', 0)|list|length == 1 %}
+              producto
+            {% else %}
+              productos
+            {% endif %}
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<!-- Pipeline de Agregación -->
+<div class="mt-5">
+  <div class="card">
+    <div class="card-header">
+      <strong>🔍 Pipeline de Agregación MongoDB</strong>
+    </div>
+    <div class="card-body">
+      <pre><code>Inventario.aggregate([
+  {
+    "$match": {
+      "stock": { "$lt": 5 }
+    }
+  },
+  {
+    "$lookup": {
+      "from": "artistas",
+      "localField": "artista_id",
+      "foreignField": "_id",
+      "as": "artista"
+    }
+  },
+  {
+    "$unwind": {
+      "path": "$artista",
+      "preserveNullAndEmptyArrays": true
+    }
+  },
+  {
+    "$project": {
+      "_id": 1,
+      "nombre": 1,
+      "stock": 1,
+      "precio_unitario": 1, // Corregido
+      "valor_total": { "$multiply": ["$stock", "$precio_unitario"] }, // Corregido
+      "artista_nombre": { "$ifNull": ["$artista.nombre", "N/A"] }
+    }
+  },
+  {
+    "$sort": { "stock": 1 }
+  }
+])</code></pre>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.jsdelivr.net; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;">
+    <title>Iniciar Sesión - Música Vintage</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            padding: 45px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .login-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        
+        .login-header p {
+            color: #999;
+            font-size: 15px;
+            margin: 0;
+        }
+        
+        .form-floating > label {
+            color: #999;
+            font-weight: 500;
+        }
+        
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+            color: var(--primary);
+        }
+        
+        .form-control {
+            border: 2px solid #e8e8e8;
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 15px;
+            background: #fafafa;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        }
+        
+        .btn-login {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .btn-login:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-login:focus {
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            outline: none;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 25px;
+            font-size: 15px;
+            animation: slideDown 0.4s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 5px solid #dc3545;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 5px solid #198754;
+        }
+        
+        .credentials-info {
+            background: linear-gradient(135deg, #f8f9ff 0%, #f5f7ff 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 35px;
+            font-size: 13px;
+            border: 2px solid #e8e8ff;
+        }
+        
+        .credentials-info h5 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+        
+        .credential-item {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .credential-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .credential-item strong {
+            color: #333;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .role-admin {
+            background: #dcf;
+            color: #0066cc;
+        }
+        
+        .role-consulta {
+            background: #ffd;
+            color: #996600;
+        }
+        
+        .role-operativo {
+            background: #cfc;
+            color: #006633;
+        }
+        
+        .credential-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 13px;
+        }
+        
+        .credential-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        code {
+            background: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #d9534f;
+            font-weight: 600;
+        }
+        
+        .permissions-text {
+            color: #888;
+            font-size: 12px;
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 30px 20px;
+            }
+            
+            .login-header h1 {
+                font-size: 26px;
+            }
+            
+            .credentials-info {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Header -->
+            <div class="login-header">
+                <h1>🎵 Música Vintage</h1>
+                <p>Sistema de Gestión de Inventario</p>
+            </div>
+            
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {% if category == 'error' %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>❌ Error:</strong> {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <strong>✅ Éxito:</strong> {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <!-- Login Form -->
+            <form method="POST" action="{{ url_for('login') }}" name="loginForm" novalidate>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Usuario" 
+                           required minlength="3" maxlength="50" autocomplete="username"
+                           pattern="[a-zA-Z0-9_-]*" title="Solo letras, números, guiones y guiones bajos">
+                    <label for="usuario">👤 Usuario</label>
+                </div>
+                
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" 
+                           required minlength="6" maxlength="100" autocomplete="current-password">
+                    <label for="password">🔐 Contraseña</label>
+                </div>
+                
+                <button type="submit" class="btn btn-login btn-primary w-100">🔓 Iniciar Sesión</button>
+            </form>
+            
+            <!-- Credentials Info -->
+            <div class="credentials-info">
+                <h5>🔑 Credenciales de Prueba</h5>
+                
+                <div class="credential-item">
+                    <strong>👨‍💼 Administrador</strong>
+                    <span class="role-badge role-admin">ADMIN</span>
+                    <div class="credential-row">
+                        <span class="credential-label">Usuario:</span>
+                        <code>ldaza</code>
+                    </div>
+                    <div class="credential-row">
+                        <span class="credential-label">Contraseña:</span>
+                        <code>admin123</code>
+                    </div>
+                    <div class="permissions-text">
+                        ✅ Consulta, ✅ Crear, ✅ Editar, ✅ Eliminar
+                    </div>
+                </div>
+                
+                <div class="credential-item">
+                    <strong>👀 Consulta (Lectura)</strong>
+                    <span class="role-badge role-consulta">LECTURA</span>
+                    <div class="credential-row">
+                        <span class="credential-label">Usuario:</span>
+                        <code>sbarbosa</code>
+                    </div>
+                    <div class="credential-row">
+                        <span class="credential-label">Contraseña:</span>
+                        <code>consulta123</code>
+                    </div>
+                    <div class="permissions-text">
+                        ✅ Consulta, ❌ Crear, ❌ Editar, ❌ Eliminar
+                    </div>
+                </div>
+                
+                <div class="credential-item">
+                    <strong>📝 Operativo</strong>
+                    <span class="role-badge role-operativo">LECTURA/INSERCIÓN</span>
+                    <div class="credential-row">
+                        <span class="credential-label">Usuario:</span>
+                        <code>dandrade</code>
+                    </div>
+                    <div class="credential-row">
+                        <span class="credential-label">Contraseña:</span>
+                        <code>operativo123</code>
+                    </div>
+                    <div class="permissions-text">
+                        ✅ Consulta, ✅ Crear, ❌ Editar, ❌ Eliminar
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validación del formulario
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form[name="loginForm"]');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const usuario = document.getElementById('usuario').value.trim();
+                    const password = document.getElementById('password').value;
+                    
+                    if (!usuario || usuario.length < 3) {
+                        e.preventDefault();
+                        alert('⚠️ El usuario debe tener al menos 3 caracteres');
+                        return;
+                    }
+                    
+                    if (!password || password.length < 6) {
+                        e.preventDefault();
+                        alert('⚠️ La contraseña debe tener al menos 6 caracteres');
+                        return;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

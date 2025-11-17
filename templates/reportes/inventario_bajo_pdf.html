@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Inventario Bajo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 12px;
+        }
+        h1 {
+            color: #dc3545;
+            text-align: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        .report-info {
+            margin-bottom: 20px;
+            font-size: 11px;
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        thead {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        th {
+            font-weight: bold;
+        }
+        .text-center { text-align: center; }
+        .text-end { text-align: right; }
+        .total-row {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 10px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <h1>⚠️ Reporte de Inventario Bajo</h1>
+    <div class="report-info">
+        <p><strong>Fecha del reporte:</strong> {{ fecha_reporte }}</p>
+        <p>Productos con <strong>stock menor a 5 unidades</strong>.</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Artista</th>
+                <th class="text-center">Stock</th>
+                <th class="text-end">Valor Unitario</th>
+                <th class="text-end">Valor Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.artista_nombre }}</td>
+                <td class="text-center">{{ producto.stock }}</td>
+                <td class="text-end">${{ "%.2f"|format(producto.precio_unitario) }}</td>
+                <td class="text-end">${{ "%.2f"|format(producto.valor_total) }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="total-row">
+                <td colspan="4" class="text-end">Valor Total en Inventario Bajo:</td>
+                <td class="text-end">${{ "%.2f"|format(productos|map(attribute='valor_total')|sum) }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <footer>
+        Música Vintage &copy; {{ fecha_reporte.split(' ')[0] }} - Reporte generado automáticamente.
+    </footer>
+</body>
+</html>

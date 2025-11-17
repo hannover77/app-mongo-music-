@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Estadísticas Generales - Música Vintage{% endblock %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h2>📈 Estadísticas Generales</h2>
+    <small class="text-muted">Agregación usando <code>$count</code> y <code>$sum</code></small>
+  </div>
+  <div class="col-md-4">
+    <a href="{{ url_for('reportes') }}" class="btn btn-secondary">← Volver a Reportes</a>
+  </div>
+</div>
+
+<div class="alert alert-info">
+  <strong>ℹ️ Operadores usados:</strong>
+  <ul class="mb-0 mt-2">
+    <li><code>$count</code> - Contar documentos en colecciones</li>
+    <li><code>$group</code> - Agrupar por null para sumar totales</li>
+    <li><code>$sum</code> - Sumar ingresos y stock</li>
+  </ul>
+</div>
+
+<div class="row">
+  <!-- Total Artistas -->
+  <div class="col-md-6 col-lg-3 mb-4">
+    <div class="card text-center shadow-sm">
+      <div class="card-body">
+        <h1 class="text-primary" style="font-size: 3rem;">{{ stats.total_artistas }}</h1>
+        <p class="text-muted mb-0">🎤 Artistas</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Clientes -->
+  <div class="col-md-6 col-lg-3 mb-4">
+    <div class="card text-center shadow-sm">
+      <div class="card-body">
+        <h1 class="text-success" style="font-size: 3rem;">{{ stats.total_clientes }}</h1>
+        <p class="text-muted mb-0">👥 Clientes</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Productos -->
+  <div class="col-md-6 col-lg-3 mb-4">
+    <div class="card text-center shadow-sm">
+      <div class="card-body">
+        <h1 class="text-warning" style="font-size: 3rem;">{{ stats.total_productos }}</h1>
+        <p class="text-muted mb-0">📦 Productos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Ventas -->
+  <div class="col-md-6 col-lg-3 mb-4">
+    <div class="card text-center shadow-sm">
+      <div class="card-body">
+        <h1 class="text-danger" style="font-size: 3rem;">{{ stats.total_ventas }}</h1>
+        <p class="text-muted mb-0">💰 Ventas</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <!-- Ingresos Totales -->
+  <div class="col-md-6 mb-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <strong>💵 Ingresos Totales</strong>
+      </div>
+      <div class="card-body text-center">
+        <h2 class="text-success">${{ "%.2f"|format(stats.ingresos_totales) }}</h2>
+        <p class="text-muted">Suma de todas las ventas realizadas</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock Total -->
+  <div class="col-md-6 mb-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-warning text-dark">
+        <strong>📦 Stock Total</strong>
+      </div>
+      <div class="card-body text-center">
+        <h2 class="text-info">{{ stats.stock_total }} unidades</h2>
+        <p class="text-muted">Cantidad total disponible en inventario</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Consultas de Agregación -->
+<div class="mt-5">
+  <div class="card">
+    <div class="card-header">
+      <strong>🔍 Consultas de Agregación MongoDB</strong>
+    </div>
+    <div class="card-body">
+      <div class="accordion" id="accordionAggregations">
+        <!-- Ingresos Totales -->
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIngresos">
+              Ingresos Totales ($sum en $group)
+            </button>
+          </h2>
+          <div id="collapseIngresos" class="accordion-collapse collapse show" data-bs-parent="#accordionAggregations">
+            <div class="accordion-body">
+              <pre><code>Ventas.aggregate([
+  {
+    "$group": {
+      "_id": null,
+      "ingresos_totales": { 
+        "$sum": { "$multiply": ["$cantidad", "$precio_unitario"] } 
+      }
+    }
+  }
+])</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stock Total -->
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStock">
+              Stock Total ($sum en inventario)
+            </button>
+          </h2>
+          <div id="collapseStock" class="accordion-collapse collapse" data-bs-parent="#accordionAggregations">
+            <div class="accordion-body">
+              <pre><code>Inventario.aggregate([
+  {
+    "$group": {
+      "_id": null,
+      "stock_total": { "$sum": "$stock" }
+    }
+  }
+])</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
