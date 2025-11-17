@@ -20,7 +20,59 @@ app.secret_key = os.getenv("SECRET_KEY", "dev_secret")
 app.config['SESSION_COOKIE_SECURE'] = False  # True en producción con HTTPS
 app.config['SESSION_COOKIE_HTTPONLY'] = True  # Evita acceso desde JavaScript
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Protección contra CSRF
-
+# ========== ENCABEZADOS DE SEGURIDAD HTTP ==========
+@app.after_request
+def set_security_headers(response):
+    """
+    Configura encabezados de seguridad HTTP en todas las respuestas
+    """
+    # 1. Content Security Policy (CSP)
+    # Controla qué recursos puede cargar el navegador
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "script-src 'self' https://cdn.jsdelivr.net; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "img-src 'self' data: https:; "
+        "font-src 'self' https://cdn.jsdelivr.net; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self';"
+    )
+    
+    # 2. Strict-Transport-Security (HSTS)
+    # Fuerza HTTPS por 1 año (31536000 segundos)
+    response.headers['Strict-Transport-Security'] = (
+        'max-age=31536000; includeSubDomains; preload'
+    )
+    
+    # 3. X-Content-Type-Options
+    # Previene MIME type sniffing
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    
+    # 4. X-Frame-Options
+    # Previene clickjacking - impide que la página se cargue en iframes
+    response.headers['X-Frame-Options'] = 'DENY'
+    
+    # 5. X-XSS-Protection
+    # Activa protección XSS del navegador
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    
+    # 6. Referrer-Policy (BONUS)
+    # Controla información de referencia enviada
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    
+    # 7. Permissions-Policy (BONUS)
+    # Controla qué características del navegador puede usar la página
+    response.headers['Permissions-Policy'] = (
+        'geolocation=(), microphone=(), camera=(), payment=()'
+    )
+    
+    # 8. X-Permitted-Cross-Domain-Policies (BONUS)
+    # Previene que Flash/PDF carguen contenido desde el sitio
+    response.headers['X-Permitted-Cross-Domain-Policies'] = 'none'
+    
+    return response
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client[os.getenv("DB_NAME", "tienda_musica")]
 
@@ -660,3 +712,4 @@ def generos_populares():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
